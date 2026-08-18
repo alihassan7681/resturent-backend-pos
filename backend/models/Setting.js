@@ -38,6 +38,15 @@ const settingSchema = new mongoose.Schema(
       type: String,
       default: 'Thank you for dining with us! Please visit again.',
     },
+    receiptPaperSize: {
+      type: String,
+      default: '80mm',
+      enum: ['80mm', '58mm'],
+    },
+    showLogoOnReceipt: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

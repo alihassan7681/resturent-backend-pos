@@ -19,15 +19,23 @@ const getDashboardSummary = async (req, res) => {
     const endOfYesterday = new Date(startOfToday);
     endOfYesterday.setMilliseconds(-1);
 
-    // Today's completed orders
+    // Today's completed orders (ONLY orderStatus: 'completed')
     const todayOrders = await Order.find({
       createdAt: { $gte: startOfToday, $lte: endOfToday },
-      paymentStatus: 'completed',
+      orderStatus: 'completed',
     });
 
     const todaySales = todayOrders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
     const todayOrdersCount = todayOrders.length;
     const todayAvgOrderValue = todayOrdersCount > 0 ? (todaySales / todayOrdersCount).toFixed(2) : 0;
+
+    // Today's pending orders (not completed yet)
+    const todayPendingOrders = await Order.find({
+      createdAt: { $gte: startOfToday, $lte: endOfToday },
+      orderStatus: { $in: ['pending', 'preparing', 'ready'] },
+    });
+    const todayPendingSales = todayPendingOrders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
+    const todayPendingCount = todayPendingOrders.length;
 
     // Today's expenses
     const todayExpensesData = await Expense.find({
@@ -39,7 +47,7 @@ const getDashboardSummary = async (req, res) => {
     // Yesterday's completed orders
     const yesterdayOrders = await Order.find({
       createdAt: { $gte: startOfYesterday, $lte: endOfYesterday },
-      paymentStatus: 'completed',
+      orderStatus: 'completed',
     });
     const yesterdaySales = yesterdayOrders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
 
@@ -69,6 +77,8 @@ const getDashboardSummary = async (req, res) => {
       todaySales,
       todayProfit,
       todayOrdersCount,
+      todayPendingSales,
+      todayPendingCount,
       todayAvgOrderValue,
       yesterdaySales,
       salesComparisonPct: Number(salesComparisonPct),
@@ -101,7 +111,7 @@ const getSalesChart = async (req, res) => {
 
       const dayOrders = await Order.find({
         createdAt: { $gte: start, $lte: end },
-        paymentStatus: 'completed',
+        orderStatus: 'completed',
       });
 
       const daySales = dayOrders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
@@ -143,23 +153,30 @@ const getAggregatedReport = async (req, res) => {
       startDate.setMonth(startDate.getMonth() - 1);
     }
 
-    const orderFilter = {
+    // ONLY completed orders are counted in official sales
+    const completedOrders = await Order.find({
       createdAt: { $gte: startDate, $lte: endDate },
-      paymentStatus: 'completed',
-    };
-
-    const completedOrders = await Order.find(orderFilter);
+      orderStatus: 'completed',
+    });
 
     const totalSales = completedOrders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
     const totalOrders = completedOrders.length;
     const totalDiscounts = completedOrders.reduce((sum, o) => sum + (o.discountAmount || 0), 0);
+
+    // Pending / In-progress orders in date range
+    const pendingOrders = await Order.find({
+      createdAt: { $gte: startDate, $lte: endDate },
+      orderStatus: { $in: ['pending', 'preparing', 'ready'] },
+    });
+    const pendingSales = pendingOrders.reduce((sum, o) => sum + (o.grandTotal || 0), 0);
+    const pendingOrdersCount = pendingOrders.length;
 
     // Expenses in date range
     const expenses = await Expense.find({ date: { $gte: startDate, $lte: endDate } });
     const totalExpenses = expenses.reduce((sum, e) => sum + (e.amount || 0), 0);
     const netProfit = totalSales - totalExpenses;
 
-    // Payment methods breakdown
+    // Payment methods breakdown (from completed orders)
     const paymentMethods = { cash: 0, card: 0, upi: 0 };
     completedOrders.forEach((o) => {
       if (paymentMethods[o.paymentMethod] !== undefined) {
@@ -167,7 +184,7 @@ const getAggregatedReport = async (req, res) => {
       }
     });
 
-    // Top selling items (Top 10)
+    // Top selling items (Top 10 from completed orders)
     const itemMap = {};
     completedOrders.forEach((order) => {
       order.items.forEach((item) => {
@@ -190,6 +207,8 @@ const getAggregatedReport = async (req, res) => {
       totalOrders,
       totalDiscounts,
       totalExpenses,
+      pendingSales,
+      pendingOrdersCount,
       netProfit,
       paymentMethods,
       topSellingItems,

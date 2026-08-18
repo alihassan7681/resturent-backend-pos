@@ -34,24 +34,27 @@ const seedDatabase = async () => {
       { name: 'Sangat Cashier', email: 'cashier@restro.com', password: 'password123', role: 'cashier', active: true },
       { name: 'Sangat Kitchen', email: 'kitchen@restro.com', password: 'password123', role: 'kitchen', active: true },
     ]);
+    console.log(`Created ${users.length} default users.`);
     
     // 2. Create Categories
     const categoriesData = [
       { name: 'Deals', icon: 'Tag', color: '#f59e0b', order: 1 },
       { name: 'Special Pizza', icon: 'Pizza', color: '#ef4444', order: 2 },
-      { name: 'Traditional Pizza', icon: 'Pizza', color: '#ef4444', order: 3 },
-      { name: 'Burgers', icon: 'Sandwich', color: '#10b981', order: 4 },
-      { name: 'Shawarma', icon: 'UtensilsCrossed', color: '#3b82f6', order: 5 },
-      { name: 'Pasta', icon: 'UtensilsCrossed', color: '#ec4899', order: 6 },
-      { name: 'Roll & Stick', icon: 'UtensilsCrossed', color: '#8b5cf6', order: 7 },
-      { name: 'Parathas', icon: 'UtensilsCrossed', color: '#f97316', order: 8 },
-      { name: 'Sandwich', icon: 'Sandwich', color: '#06b6d4', order: 9 },
+      { name: 'Traditional Pizza', icon: 'Pizza', color: '#dc2626', order: 3 },
+      { name: 'Burgers', icon: 'Beef', color: '#10b981', order: 4 },
+      { name: 'Shawarma', icon: 'Utensils', color: '#3b82f6', order: 5 },
+      { name: 'Pasta', icon: 'Soup', color: '#ec4899', order: 6 },
+      { name: 'Roll & Stick', icon: 'Flame', color: '#8b5cf6', order: 7 },
+      { name: 'Parathas', icon: 'Cookie', color: '#f97316', order: 8 },
+      { name: 'Sandwich', icon: 'Beef', color: '#06b6d4', order: 9 },
       { name: 'Crispy & Fried Chicken', icon: 'Drumstick', color: '#eab308', order: 10 },
-      { name: 'Fries', icon: 'UtensilsCrossed', color: '#fb923c', order: 11 },
-      { name: 'Chai Shai & Coffee', icon: 'Coffee', color: '#6366f1', order: 12 },
-      { name: 'Cold Drinks', icon: 'CupSoda', color: '#14b8a6', order: 13 },
+      { name: 'Fries', icon: 'Salad', color: '#fb923c', order: 11 },
+      { name: 'Chai Shai', icon: 'CupSoda', color: '#6366f1', order: 12 },
+      { name: 'Coffee', icon: 'Coffee', color: '#a855f7', order: 13 },
+      { name: 'Cold Drinks', icon: 'GlassWater', color: '#14b8a6', order: 14 },
     ];
     const categories = await Category.create(categoriesData);
+    console.log(`Created ${categories.length} categories.`);
     
     const catMap = {};
     categories.forEach(c => { catMap[c.name] = c._id; });
@@ -134,7 +137,7 @@ const seedDatabase = async () => {
       { name: 'Spin Roll', category: catMap['Roll & Stick'], price: 400 },
       { name: 'Behari Roll', category: catMap['Roll & Stick'], price: 450 },
       { name: 'Arabic Roll', category: catMap['Roll & Stick'], price: 450 },
-      { name: 'Cheese Stick', category: catMap['Roll & Stick'], price: 900 },
+      { name: 'Cheese Stick M', category: catMap['Roll & Stick'], price: 900 },
 
       // Parathas
       { name: 'Chicken Paratha Roll', category: catMap['Parathas'], price: 230 },
@@ -165,53 +168,65 @@ const seedDatabase = async () => {
       // Fries
       { name: 'Loaded Fries (H)', category: catMap['Fries'], price: 350 },
       { name: 'Loaded Fries (F)', category: catMap['Fries'], price: 650 },
-      { name: 'Maslala Fries (H)', category: catMap['Fries'], price: 250 },
-      { name: 'Maslala Fries (F)', category: catMap['Fries'], price: 450 },
+      { name: 'Masala Fries (H)', category: catMap['Fries'], price: 250 },
+      { name: 'Masala Fries (F)', category: catMap['Fries'], price: 450 },
       { name: 'Plain Fries (H)', category: catMap['Fries'], price: 200 },
       { name: 'Plain Fries (F)', category: catMap['Fries'], price: 400 },
 
-      // Chai Shai & Coffee
-      { name: 'Karrak Chai', category: catMap['Chai Shai & Coffee'], price: 100 },
-      { name: 'Gurh Wali Chai', category: catMap['Chai Shai & Coffee'], price: 100 },
-      { name: 'Elaichi Wali Chai', category: catMap['Chai Shai & Coffee'], price: 150 },
-      { name: 'Adrak Wali Chai', category: catMap['Chai Shai & Coffee'], price: 130 },
-      { name: 'Chocolate Chai', category: catMap['Chai Shai & Coffee'], price: 180 },
-      { name: 'Sabaz Chai', category: catMap['Chai Shai & Coffee'], price: 200 },
-      { name: 'Cappuccino Coffee', category: catMap['Chai Shai & Coffee'], price: 480 },
-      { name: 'Cardamom Coffee', category: catMap['Chai Shai & Coffee'], price: 300 },
-      { name: 'Cream Coffee', category: catMap['Chai Shai & Coffee'], price: 350 },
-      { name: 'Chocolate Coffee', category: catMap['Chai Shai & Coffee'], price: 380 },
+      // Chai Shai
+      { name: 'Karrak Chai', category: catMap['Chai Shai'], price: 100 },
+      { name: 'Gurh Wali Chai', category: catMap['Chai Shai'], price: 100 },
+      { name: 'Elaichi Wali Chai', category: catMap['Chai Shai'], price: 150 },
+      { name: 'Adrak Wali Chai', category: catMap['Chai Shai'], price: 130 },
+      { name: 'Chocolate Chai', category: catMap['Chai Shai'], price: 180 },
+      { name: 'Sabaz Chai', category: catMap['Chai Shai'], price: 200 },
+
+      // Coffee
+      { name: 'Cappuccino Coffee', category: catMap['Coffee'], price: 480 },
+      { name: 'Cardamom Coffee', category: catMap['Coffee'], price: 300 },
+      { name: 'Cream Coffee', category: catMap['Coffee'], price: 350 },
+      { name: 'Chocolate Coffee', category: catMap['Coffee'], price: 380 },
 
       // Cold Drinks
       { name: 'Mint Margrita', category: catMap['Cold Drinks'], price: 200 },
       { name: 'Lemonade', category: catMap['Cold Drinks'], price: 200 },
-      { name: 'Soft Drink', category: catMap['Cold Drinks'], price: 100 }, // No price provided, assumed 100
-      { name: 'Mineral Water', category: catMap['Cold Drinks'], price: 80 }, // No price provided, assumed 80
+      { name: 'Soft Drink (Half Ltr)', category: catMap['Cold Drinks'], price: 100 },
+      { name: 'Soft Drink (1 Ltr)', category: catMap['Cold Drinks'], price: 180 },
+      { name: 'Soft Drink (1.5 Ltr)', category: catMap['Cold Drinks'], price: 250 },
+      { name: 'Soft Drink (2 Ltr)', category: catMap['Cold Drinks'], price: 300 },
+      { name: 'Mineral Water (Small)', category: catMap['Cold Drinks'], price: 80 },
+      { name: 'Mineral Water (Large)', category: catMap['Cold Drinks'], price: 150 },
     ];
 
-    await MenuItem.create(menuItemsData.map(m => ({ ...m, isAvailable: true, isVeg: false })));
-    console.log(`Created ${menuItemsData.length} menu items.`);
+    const menuItems = await MenuItem.create(menuItemsData.map(m => ({ ...m, isAvailable: true, isVeg: false })));
+    console.log(`Created ${menuItems.length} menu items.`);
 
     // 4. Create Tables
     const tablesData = [];
     for(let i=1; i<=10; i++) tablesData.push({ tableNumber: `T-${i}`, capacity: 4, status: 'available' });
-    await Table.create(tablesData);
-    console.log(`Created tables.`);
+    const tables = await Table.create(tablesData);
+    console.log(`Created ${tables.length} tables.`);
 
     // 5. Create Settings
     await Setting.create({
       restaurantName: 'Sangat Café',
       tagline: 'A Taste You\'ll Remember',
       address: 'Fareed Town near, Ghareeb Nawaz Hotel, Mini Bypass Canal Road, Samundri',
-      phone: '0307-9397232',
+      phone: '0307-9793232',
       email: 'contact@sangatcafe.com',
+      gstNumber: '',
       taxRatePercent: 0,
       currencySymbol: 'Rs.',
-      receiptFooter: 'Thank you for visiting Sangat Café!',
+      receiptFooter: 'Thank you for visiting Sangat Café! Please visit again.',
     });
     console.log('Created default restaurant settings.');
 
     console.log('\n--- Sangat Menu Seeding Completed Successfully! ---');
+    console.log('Default Credentials:');
+    console.log('Admin: admin@restro.com / password123');
+    console.log('Cashier: cashier@restro.com / password123');
+    console.log('Kitchen Staff: kitchen@restro.com / password123');
+
     process.exit(0);
   } catch (error) {
     console.error('Database Seeding Error:', error);
